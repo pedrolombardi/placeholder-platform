@@ -1,0 +1,113 @@
+# Placeholder — plataforma completa do MVP: bancos de demonstração + 5 serviços.
+#
+#   docker compose up --build        ->  http://localhost:8080
+#   npm run e2e                      ->  fluxo completo pela API do Backend Core
+#
+# Cada serviço é construído direto do seu repositório no GitHub (branch main):
+# não é preciso clonar nada além deste repositório.
+name: placeholder
+
+services:
+  # ---- bancos de demonstração (seeds do DB Layer) -------------------------
+  mysql:
+    build: https://github.com/pedrolombardi/placeholder-db-layer.git#main:seeds/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: vendas
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  oracle:
+    build: https://github.com/pedrolombardi/placeholder-db-layer.git#main:seeds/oracle
+    environment:
+      ORACLE_PASSWORD: oracle
+      APP_USER: vendas
+      APP_USER_PASSWORD: vendas
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 15s
+      timeout: 10s
+      retries: 40
+      start_period: 120s
+
+  postgres:
+    build:
+      context: https://github.com/pedrolombardi/placeholder-backend-core.git#main:backend/db
+      dockerfile_inline: |
+        FROM postgres:16-alpine
+        COPY init.sql /docker-entrypoint-initdb.d/
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: migrations
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d migrations"]
+      interval: 2s
+      retries: 15
+
+  # ---- serviços ------------------------------------------------------------
+  db-layer:
+    build: https://github.com/pedrolombardi/placeholder-db-layer.git#main
+    environment:
+      PORT: 3002
+      SRC_HOST: mysql
+      SRC_PORT: 3306
+      SRC_USER: readonly
+      SRC_PASSWORD: readonly
+      SRC_DATABASE: vendas
+      TGT_HOST: oracle
+      TGT_PORT: 1521
+      TGT_SERVICE: FREEPDB1
+      TGT_USER: vendas
+      TGT_PASSWORD: vendas
+      SBX_USER: sandbox
+      SBX_PASSWORD: sandbox
+    depends_on:
+      mysql: { condition: service_healthy }
+      oracle: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3002/health/db').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
+      interval: 5s
+      retries: 24
+    ports:
+      - "3002:3002"
+
+  ai-layer:
+    build: https://github.com/pedrolombardi/placeholder-ai-layer.git#main
+    environment:
+      PORT: 3001
+      DB_LAYER_URL: http://db-layer:3002
+    depends_on:
+      db-layer: { condition: service_healthy }
+
+  data-layer:
+    build: https://github.com/vzio/placeholder-data-layer.git#main
+
+  backend:
+    build: https://github.com/pedrolombardi/placeholder-backend-core.git#main:backend
+    environment:
+      PORT: 3000
+      DATABASE_URL: postgres://app:app@postgres:5432/migrations
+      DB_LAYER_URL: http://db-layer:3002
+      AI_LAYER_URL: http://ai-layer:3001
+      DATA_LAYER_URL: http://data-layer:8080
+      HTTP_TIMEOUT_MS: 30000
+      HTTP_RETRIES: 1
+    depends_on:
+      postgres: { condition: service_healthy }
+      db-layer: { condition: service_healthy }
+      ai-layer: { condition: service_started }
+      data-layer: { condition: service_started }
+    ports:
+      - "3000:3000"
+
+  front:
+    build: https://github.com/pedrolombardi/placeholder-front.git#main
+    depends_on:
+      - backend
+    ports:
+      - "8080:80"

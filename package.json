@@ -1,0 +1,7 @@
+{
+  "name": "placeholder-platform",
+  "private": true,
+  "scripts": {
+    "e2e": "node scripts/e2e.mjs"
+  }
+}

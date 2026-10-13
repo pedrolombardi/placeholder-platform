@@ -1,0 +1,26 @@
+name: e2e
+
+# Sobe a plataforma inteira a partir dos repositorios de cada servico e roda o
+# fluxo completo pela API do Backend Core. Quebrou um contrato entre servicos?
+# Este workflow fica vermelho.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Subir a plataforma (build direto dos repositorios)
+        run: docker compose up -d --build --wait --wait-timeout 1200
+      - name: Fluxo completo
+        run: node scripts/e2e.mjs
+      - name: Logs em caso de falha
+        if: failure()
+        run: docker compose logs --no-color --tail 200
