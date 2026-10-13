@@ -7,6 +7,9 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # diario: pega mudancas nos repositorios dos servicos, que nao disparam este workflow
+  schedule:
+    - cron: '0 9 * * *'
 
 jobs:
   e2e:

@@ -19,12 +19,24 @@ docker compose up --build        # primeiro build: ~10-15 min (Rust do Data Laye
 - **DB Layer:** http://localhost:3002
 
 Requisitos: Docker com ~8 GB de memória. A imagem do Oracle roda em Intel e em Apple Silicon.
+As portas são publicadas só em `127.0.0.1` (não há autenticação no MVP).
 
 Teste ponta a ponta (com a plataforma no ar, Node 18+, sem `npm install`):
 
 ```bash
 npm run e2e
 ```
+
+## Documentação da entrega
+
+| | |
+|---|---|
+| Mapa da atividade (partes 1–6) | [docs/ENTREGA.md](docs/ENTREGA.md) |
+| Arquitetura, crescimento e escalabilidade | [docs/ARQUITETURA.md](docs/ARQUITETURA.md) · [PNG](docs/arquitetura-plataforma.png) |
+| Validação técnica | [docs/VALIDACAO_TECNICA.md](docs/VALIDACAO_TECNICA.md) |
+| Roadmap | [docs/ROADMAP.md](docs/ROADMAP.md) |
+| Teste de usabilidade (roteiro) | [docs/USABILIDADE.md](docs/USABILIDADE.md) |
+| Prints do fluxo | [docs/prints/](docs/prints/) |
 
 ## Serviços
 
