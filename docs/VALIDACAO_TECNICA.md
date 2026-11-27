@@ -42,12 +42,12 @@ Prints: [`prints/`](prints/). Teste automatizado: `scripts/e2e.mjs` (CI: `.githu
 | Credenciais da origem em texto no PostgreSQL do Core | Alto em produção | ⏳ Fase 7 (cofre de segredos) |
 | Regras da IA calibradas para os conflitos de demonstração | Médio | ⚠️ conflito novo de julgamento vira DEFER (seguro); generalizar na Fase 7 |
 | Contratos entre repositórios divergirem | Médio | ✅ testes de contrato + e2e no CI (push e diário) |
-| AI Layer e front sem testes automatizados | Médio | ⚠️ cobertos só pelo e2e |
+| Front sem testes automatizados | Médio | ⚠️ coberto só pelo e2e (a AI Layer ganhou 106 testes e CI na Fase 7) |
 
 ## 4. Gargalos de performance e arquitetura
 
-1. **Validação serializada** (uma por vez por schema SANDBOX) → sandbox por migração.
-2. **Leitura da tabela inteira** nos probes da análise → amostragem com limite de tempo.
+1. ~~Validação serializada~~ → **resolvido na Fase 7**: um sandbox por migração, validações em paralelo.
+2. **Leitura da tabela inteira** nos probes → **mitigado na Fase 7**: limite de tempo e teto de linhas (`sampled`); falta amostragem representativa.
 3. **Catálogo relido a cada chamada** de tool → cache com expiração.
 4. **Amostra de 1.000 linhas por PK** → amostragem estratificada.
 
