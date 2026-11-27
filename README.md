@@ -27,6 +27,19 @@ Teste ponta a ponta (com a plataforma no ar, Node 18+, sem `npm install`):
 npm run e2e
 ```
 
+**Login.** O Backend Core sobe com `AUTH_ENABLED=true`. Usuários de demonstração (troque com
+`AUTH_SEED_USERS` e `JWT_SECRET` no ambiente): `dba` / `dba123` (perfil DBA: homologa e executa) e
+`qa` / `qa123` (perfil DEV_QA: cria, analisa e consulta). O e2e entra como `dba` (`E2E_USER`,
+`E2E_PASSWORD`) e confere que o `qa` recebe 403 ao tentar homologar.
+
+**Outra versão de um serviço.** Cada serviço é construído do `main` do seu repositório. Para
+testar uma branch ou fork, aponte a variável do serviço para a URL git (`URL#branch`):
+`DB_LAYER_SRC`, `AI_LAYER_SRC`, `DATA_LAYER_SRC`, `CORE_SRC`, `FRONT_SRC`. Exemplo:
+
+```bash
+AI_LAYER_SRC=https://github.com/<usuario>/placeholder-ai-layer.git#minha-branch docker compose up --build
+```
+
 ## Documentação da entrega
 
 | | |
