@@ -32,6 +32,11 @@ npm run e2e
 `qa` / `qa123` (perfil DEV_QA: cria, analisa e consulta). O e2e entra como `dba` (`E2E_USER`,
 `E2E_PASSWORD`) e confere que o `qa` recebe 403 ao tentar homologar.
 
+**Teste pela interface.** `npm run e2e:ui` (precisa de `npm i -D playwright` e
+`npx playwright install chromium`) percorre o front como um usuário: login, dashboard, uma
+migração completa, relatórios, auditoria, conexões, configurações e o perfil DEV_QA.
+Os prints ficam em `docs/prints/ui-e2e/`.
+
 **Outra versão de um serviço.** Cada serviço é construído do `main` do seu repositório. Para
 testar uma branch ou fork, aponte a variável do serviço para a URL git (`URL#branch`):
 `DB_LAYER_SRC`, `AI_LAYER_SRC`, `DATA_LAYER_SRC`, `CORE_SRC`, `FRONT_SRC`. Exemplo:
