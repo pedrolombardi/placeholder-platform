@@ -106,8 +106,12 @@ flowchart LR
   assistida fica para a Fase 7.
 - A origem é a configurada no DB Layer (`vendas`). Credenciais por migração ficam para a Fase 7;
   outro banco é recusado (400).
-- As regras da AI Layer são determinísticas e calibradas para os conflitos de demonstração. O
-  chat com LLM (`/ai/chat`) exige chave de API e não faz parte do fluxo.
+- As regras da AI Layer são determinísticas e decidem pela família do tipo (texto, booleano,
+  datas, JSON) e pelas evidências do DB Layer, sem nomes de tabela ou coluna. Datas, JSON e
+  `ON UPDATE` sempre vão para o DBA. O chat com LLM (`/ai/chat`) exige chave de API e não faz
+  parte do fluxo.
 - A amostra enviada ao sandbox é limitada a 1.000 linhas por tabela.
-- O Core guarda as credenciais da origem em texto no PostgreSQL. As credenciais do compose são
-  de demonstração.
+- O Core não guarda credenciais da origem: quem conecta é o DB Layer, com as credenciais do
+  ambiente dele. As credenciais e os usuários do compose são de demonstração.
+- Login sem recuperação de senha nem cadastro pela tela: os usuários são criados pelo
+  administrador (`AUTH_SEED_USERS`).

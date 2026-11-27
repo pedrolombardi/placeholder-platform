@@ -61,8 +61,9 @@ repositório monta tudo com um `docker compose up`.
 
 - **Um repositório por serviço**, com dono, testes e Dockerfile próprios; este repositório só
   orquestra.
-- **Testes:** DB Layer 50 (com teste de contrato do Core); AI Layer 106 (Fase 7, com CI); Core 17 (com tradução dos contratos
-  da IA e do Data Layer); Data Layer com suíte própria; e2e da plataforma no CI, a cada push e
-  diariamente.
+- **Testes:** DB Layer 62 (com teste de contrato do Core); AI Layer 125 (regras por família de
+  tipo, com CI); Core 89 (auth, perfis, transições atômicas, conexões, contratos da IA e do Data
+  Layer); Data Layer com suíte própria; e2e da plataforma pela API (`npm run e2e`) e pela
+  interface (`npm run e2e:ui`, Playwright).
 - **Falhar alto:** erros de qualquer layer chegam ao usuário com a explicação de quem recusou
   (por exemplo, "origem configurada e vendas, nao erp"), e a migração vai a `FAILED` com o motivo.
