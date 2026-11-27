@@ -49,8 +49,11 @@ repositório monta tudo com um `docker compose up`.
   migração fica no PostgreSQL): podem rodar em N réplicas atrás de um balanceador.
 - **O trabalho pesado fica nos bancos:** a análise usa agregações (`COUNT`, `MAX`, `SUM CASE`)
   e trafega números, não linhas. A amostra para o sandbox é limitada (1.000 linhas por tabela).
-- **Gargalo conhecido:** a validação é serializada, uma por vez por schema SANDBOX. Para
-  paralelizar, a Fase 7 prevê um sandbox por migração.
+- **Validações em paralelo (Fase 7):** cada execução usa tabelas próprias no schema SANDBOX
+  (prefixo por execução), apagadas no fim.
+- **Custo limitado na origem (Fase 7):** toda consulta do DB Layer tem limite de tempo
+  (`QUERY_TIMEOUT_MS`, 504 ao estourar), e as análises leem no máximo `PROBE_MAX_ROWS` linhas
+  (resultado marcado `sampled`).
 - **Execução assíncrona:** análise e execução rodam em background no Core (HTTP 202 + consulta
   de status), então requisições longas não seguram conexões do front.
 
@@ -58,7 +61,7 @@ repositório monta tudo com um `docker compose up`.
 
 - **Um repositório por serviço**, com dono, testes e Dockerfile próprios; este repositório só
   orquestra.
-- **Testes:** DB Layer 43 (com teste de contrato do Core); Core 17 (com tradução dos contratos
+- **Testes:** DB Layer 50 (com teste de contrato do Core); AI Layer 106 (Fase 7, com CI); Core 17 (com tradução dos contratos
   da IA e do Data Layer); Data Layer com suíte própria; e2e da plataforma no CI, a cada push e
   diariamente.
 - **Falhar alto:** erros de qualquer layer chegam ao usuário com a explicação de quem recusou
