@@ -40,9 +40,9 @@ Prints: [`prints/`](prints/). Teste automatizado: `scripts/e2e.mjs` (CI: `.githu
 | Dado pessoal chegando ao LLM | Alto | ✅ `sample-values` mascara colunas de alta cardinalidade |
 | Sem autenticação (front e API) | Alto | ⏳ Fase 7. Mitigação: portas só em `127.0.0.1` |
 | Credenciais da origem em texto no PostgreSQL do Core | Alto em produção | ⏳ Fase 7 (cofre de segredos) |
-| Regras da IA calibradas para os conflitos de demonstração | Médio | ⚠️ conflito novo de julgamento vira DEFER (seguro); generalizar na Fase 7 |
+| Regras da IA calibradas para os conflitos de demonstração | Médio | ⚠️ conflito novo de julgamento vira DEFER (seguro); generalizar na próxima fase |
 | Contratos entre repositórios divergirem | Médio | ✅ testes de contrato + e2e no CI (push e diário) |
-| Front sem testes automatizados | Médio | ⚠️ coberto só pelo e2e (a AI Layer ganhou 106 testes e CI na Fase 7) |
+| Front sem testes automatizados | Médio | ⚠️ sem testes unitários; coberto pelo e2e de interface (`npm run e2e:ui`, 15 passos) |
 
 ## 4. Gargalos de performance e arquitetura
 

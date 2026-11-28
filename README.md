@@ -27,6 +27,24 @@ Teste ponta a ponta (com a plataforma no ar, Node 18+, sem `npm install`):
 npm run e2e
 ```
 
+**Login.** O Backend Core sobe com `AUTH_ENABLED=true`. Usuários de demonstração (troque com
+`AUTH_SEED_USERS` e `JWT_SECRET` no ambiente): `dba` / `dba123` (perfil DBA: homologa e executa) e
+`qa` / `qa123` (perfil DEV_QA: cria, analisa e consulta). O e2e entra como `dba` (`E2E_USER`,
+`E2E_PASSWORD`) e confere que o `qa` recebe 403 ao tentar homologar.
+
+**Teste pela interface.** `npm run e2e:ui` (precisa de `npm i -D playwright` e
+`npx playwright install chromium`) percorre o front como um usuário: login, dashboard, uma
+migração completa, relatórios, auditoria, conexões, configurações e o perfil DEV_QA.
+Os prints ficam em `docs/prints/ui-e2e/`.
+
+**Outra versão de um serviço.** Cada serviço é construído do `main` do seu repositório. Para
+testar uma branch ou fork, aponte a variável do serviço para a URL git (`URL#branch`):
+`DB_LAYER_SRC`, `AI_LAYER_SRC`, `DATA_LAYER_SRC`, `CORE_SRC`, `FRONT_SRC`. Exemplo:
+
+```bash
+AI_LAYER_SRC=https://github.com/<usuario>/placeholder-ai-layer.git#minha-branch docker compose up --build
+```
+
 ## Documentação da entrega
 
 | | |
@@ -91,5 +109,7 @@ flowchart LR
 - As regras da AI Layer são determinísticas e calibradas para os conflitos de demonstração. O
   chat com LLM (`/ai/chat`) exige chave de API e não faz parte do fluxo.
 - A amostra enviada ao sandbox é limitada a 1.000 linhas por tabela.
-- O Core guarda as credenciais da origem em texto no PostgreSQL. As credenciais do compose são
-  de demonstração.
+- O Core não guarda credenciais da origem: quem conecta é o DB Layer, com as credenciais do
+  ambiente dele. As credenciais e os usuários do compose são de demonstração.
+- Login sem recuperação de senha nem cadastro pela tela: os usuários são criados pelo
+  administrador (`AUTH_SEED_USERS`).

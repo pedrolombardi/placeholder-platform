@@ -23,7 +23,7 @@
 
 | Prio | Entrega | Parte |
 |---|---|---|
-| P1 | **Autenticação e perfis** (login real, RBAC: DBA × dev/QA) e autenticação entre serviços | Front, Core |
+| P1 | Autenticação entre serviços (o login real com perfis DBA × dev/QA já está no Core e no front) | Core, layers |
 | P1 | **Credenciais por migração** (conectar no banco informado na tela) guardadas em cofre de segredos | Core, DB Layer |
 | P1 | **Execução assistida do script** no destino, com carga dos dados e verificação pós-carga | DB Layer, Core |
 | P1 | **IA generalizada**: escolher tools e regras pelo `rules` do diff; modelo com saída estruturada | AI Layer |

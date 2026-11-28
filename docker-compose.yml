@@ -7,13 +7,15 @@
 # origem (/extract/sample) e nada aqui tem autenticacao.
 #
 # Cada serviço é construído direto do seu repositório no GitHub (branch main):
-# não é preciso clonar nada além deste repositório.
+# não é preciso clonar nada além deste repositório. Para construir outra branch,
+# fork ou clone local, defina DB_LAYER_SRC, AI_LAYER_SRC, DATA_LAYER_SRC, CORE_SRC
+# ou FRONT_SRC com uma URL git no formato do docker build: URL#branch.
 name: placeholder
 
 services:
   # ---- bancos de demonstração (seeds do DB Layer) -------------------------
   mysql:
-    build: https://github.com/pedrolombardi/placeholder-db-layer.git#main:seeds/mysql
+    build: ${DB_LAYER_SRC:-https://github.com/pedrolombardi/placeholder-db-layer.git#main}:seeds/mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: vendas
@@ -25,7 +27,7 @@ services:
       start_period: 30s
 
   oracle:
-    build: https://github.com/pedrolombardi/placeholder-db-layer.git#main:seeds/oracle
+    build: ${DB_LAYER_SRC:-https://github.com/pedrolombardi/placeholder-db-layer.git#main}:seeds/oracle
     environment:
       ORACLE_PASSWORD: oracle
       APP_USER: vendas
@@ -39,7 +41,7 @@ services:
 
   postgres:
     build:
-      context: https://github.com/pedrolombardi/placeholder-backend-core.git#main:backend/db
+      context: ${CORE_SRC:-https://github.com/pedrolombardi/placeholder-backend-core.git#main}:backend/db
       dockerfile_inline: |
         FROM postgres:16-alpine
         COPY init.sql /docker-entrypoint-initdb.d/
@@ -54,7 +56,7 @@ services:
 
   # ---- serviços ------------------------------------------------------------
   db-layer:
-    build: https://github.com/pedrolombardi/placeholder-db-layer.git#main
+    build: ${DB_LAYER_SRC:-https://github.com/pedrolombardi/placeholder-db-layer.git#main}
     environment:
       PORT: 3002
       SRC_HOST: mysql
@@ -80,7 +82,7 @@ services:
       - "127.0.0.1:3002:3002"
 
   ai-layer:
-    build: https://github.com/pedrolombardi/placeholder-ai-layer.git#main
+    build: ${AI_LAYER_SRC:-https://github.com/pedrolombardi/placeholder-ai-layer.git#main}
     environment:
       PORT: 3001
       DB_LAYER_URL: http://db-layer:3002
@@ -88,10 +90,10 @@ services:
       db-layer: { condition: service_healthy }
 
   data-layer:
-    build: https://github.com/vzio/placeholder-data-layer.git#main
+    build: ${DATA_LAYER_SRC:-https://github.com/vzio/placeholder-data-layer.git#main}
 
   backend:
-    build: https://github.com/pedrolombardi/placeholder-backend-core.git#main:backend
+    build: ${CORE_SRC:-https://github.com/pedrolombardi/placeholder-backend-core.git#main}:backend
     environment:
       PORT: 3000
       DATABASE_URL: postgres://app:app@postgres:5432/migrations
@@ -100,6 +102,10 @@ services:
       DATA_LAYER_URL: http://data-layer:8080
       HTTP_TIMEOUT_MS: 30000
       HTTP_RETRIES: 1
+      # Login + perfis (RBAC): o front manda o token. Troque o segredo fora da demo.
+      AUTH_ENABLED: "true"
+      JWT_SECRET: ${JWT_SECRET:-segredo-de-demonstracao-troque-em-producao}
+      AUTH_SEED_USERS: ${AUTH_SEED_USERS:-dba:dba123:DBA,qa:qa123:DEV_QA}
     depends_on:
       postgres: { condition: service_healthy }
       db-layer: { condition: service_healthy }
@@ -109,7 +115,7 @@ services:
       - "127.0.0.1:3000:3000"
 
   front:
-    build: https://github.com/pedrolombardi/placeholder-front.git#main
+    build: ${FRONT_SRC:-https://github.com/pedrolombardi/placeholder-front.git#main}
     depends_on:
       - backend
     ports:
